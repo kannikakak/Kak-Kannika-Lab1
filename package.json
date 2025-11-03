@@ -2,6 +2,7 @@
   "name": "Kak-Kannika-Lab1",
   "version": "1.0.0",
   "main": "server.js",
+  "type": "module",
   "repository": "https://github.com/kannikakak/Kak-Kannika-Lab1.git",
   "author": "kannikakak <kakkannika896@gmail.com>",
   "license": "MIT",
