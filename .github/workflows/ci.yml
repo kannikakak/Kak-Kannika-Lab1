@@ -1,4 +1,4 @@
-name: Node.js CI (Yarn)
+name: Node.js CI/CD
 
 on:
   push:
@@ -7,38 +7,56 @@ on:
     branches: [ main ]
 
 jobs:
-  build-and-test:
-    name: Build and Test on Node ${{ matrix.node-version }}
+  build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [18.x]
+
     steps:
-      - name: Checkout code
+      # Checkout the code
+      - name: Checkout repo
         uses: actions/checkout@v4
+
+      # Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 22
           cache: 'yarn'
+
+      # Install dependencies
       - name: Install dependencies
         run: yarn install --frozen-lockfile
-      - name: Lint code
+
+      # Run ESLint
+      - name: Run ESLint
         run: yarn lint
-      - name: Run tests
+
+      # Run tests
+      - name: Run Tests
         run: yarn test
-      - name: Run coverage
+
+      # Run code coverage
+      - name: Run Code Coverage
         run: yarn coverage
-      - name: Upload coverage artifact
+
+      # Upload coverage report as artifact
+      - name: Upload Coverage Report
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
-          path: coverage/
-          overwrite: true
+          path: coverage/lcov-report
+
+      # Install Vercel CLI
+      - name: Install Vercel CLI
+        run: yarn global add vercel
+
+      # Deploy to Vercel
       - name: Deploy to Vercel
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          working-directory: ./
-          prod: true
+        if: github.ref == 'refs/heads/main' && success()
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          if [ -z "$VERCEL_TOKEN" ]; then
+            echo "❌ ERROR: VERCEL_TOKEN is not set. Please add it in GitHub Secrets."
+            exit 1
+          fi
+          vercel --prod --yes --token "$VERCEL_TOKEN"
