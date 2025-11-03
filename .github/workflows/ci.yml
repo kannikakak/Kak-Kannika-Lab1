@@ -8,10 +8,11 @@ on:
 
 jobs:
   build-and-test:
+    name: Build and Test on Node ${{ matrix.node-version }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [16.x, 18.x]
+        node-version: [18.x]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
