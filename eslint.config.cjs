@@ -3,7 +3,7 @@ module.exports = [
     files: ["**/*.js"],
     languageOptions: {
       ecmaVersion: 2021,
-      sourceType: "commonjs",
+      sourceType: "module",
     },
     rules: {
       // Add custom rules here if needed
